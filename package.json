@@ -15,6 +15,7 @@
     "clsx": "^2.1.1",
     "lucide-react": "^0.424.0",
     "next": "14.2.5",
+    "puppeteer": "^23.0.1",
     "react": "^18",
     "react-dom": "^18",
     "recharts": "^2.12.7",
@@ -24,6 +25,7 @@
   "devDependencies": {
     "@shadcn/ui": "^0.0.4",
     "@types/node": "^20",
+    "@types/puppeteer": "^7.0.4",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "postcss": "^8",

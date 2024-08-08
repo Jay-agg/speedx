@@ -1,6 +1,6 @@
 "use server";
 import type { NextApiRequest, NextApiResponse } from "next";
-import axios from "axios";
+import puppeteer from "puppeteer";
 
 type Data = {
   pageLoadTime: number;
@@ -23,14 +23,32 @@ export default async function handler(
   }
 
   try {
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+
+    let totalRequestSize = 0;
+    let numberOfRequests = 0;
+
+    // Intercept and track all network requests
+    page.on("request", (request) => {
+      numberOfRequests++;
+    });
+
+    // Intercept and track responses to calculate total request size
+    page.on("response", async (response) => {
+      const headers = response.headers();
+      if (headers["content-length"]) {
+        totalRequestSize += parseInt(headers["content-length"]) / 1024; // in KB
+      }
+    });
+
     const startTime = Date.now();
-    const response = await axios.get(url);
+    await page.goto(url, { waitUntil: "networkidle0" }); // Wait until no more network activity
     const endTime = Date.now();
 
     const pageLoadTime = endTime - startTime;
-    const totalRequestSize =
-      parseInt(response.headers["content-length"] || "0") / 1024; // in KB
-    const numberOfRequests = 1; // This is simplified; in reality, you'd need to analyze all resources
+
+    await browser.close();
 
     res.status(200).json({
       pageLoadTime: Math.round(pageLoadTime),
